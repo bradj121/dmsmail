@@ -24,6 +24,18 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
+def delete_user(db: Session, user_id: int):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        db.delete(user)
+        db.commit()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        return False 
+    else:
+        return True
+
+
 def get_policies(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Policy).offset(skip).limit(limit).all()
 
