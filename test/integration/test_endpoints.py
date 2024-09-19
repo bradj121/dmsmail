@@ -1,5 +1,4 @@
 import requests
-import pytest
 
 
 ENDPOINT = "http://localhost:8000"
