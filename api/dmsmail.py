@@ -44,6 +44,15 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_user(db=db, user_id=user_id)
+    if deleted:
+        return f"User {user_id} has been deleted"
+    else:
+        raise HTTPException(status_code=400, detail="Failed to delete user")
+
+
 @app.post("/users/{user_id}/policies", response_model=schemas.Policy)
 def create_policy_for_user(user_id: int, policy: schemas.PolicyCreate, db: Session = Depends(get_db)):
     return crud.create_policy(db=db, policy=policy, user_id=user_id)
