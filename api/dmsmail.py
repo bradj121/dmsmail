@@ -30,7 +30,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 
-@app.get("/users/", response_model=list[schemas.User])
+@app.get("/api/users", response_model=list[schemas.User])
 def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = crud.get_users(db, skip=skip, limit=limit)
     return users
@@ -58,7 +58,7 @@ def create_policy_for_user(user_id: int, policy: schemas.PolicyCreate, db: Sessi
     return crud.create_policy(db=db, policy=policy, user_id=user_id)
 
 
-@app.get("/policies/", response_model=list[schemas.Policy])
+@app.get("/api/policies", response_model=list[schemas.Policy])
 def get_policies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     policies = crud.get_policies(db, skip=skip, limit=limit)
     return policies

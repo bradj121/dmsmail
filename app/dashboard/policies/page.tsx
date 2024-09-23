@@ -1,7 +1,7 @@
 import Pagination from '@/app/ui/policies/pagination';
 import Search from '@/app/ui/search';
 import Table from '@/app/ui/policies/table';
-import { CreateInvoice } from '@/app/ui/policies/buttons';
+import { CreatePolicy } from '@/app/ui/policies/buttons';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
  
@@ -13,7 +13,7 @@ export default async function Page() {
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search policies..." />
-        <CreateInvoice />
+        <CreatePolicy />
       </div>
       {/*  <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
