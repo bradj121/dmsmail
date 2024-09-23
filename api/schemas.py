@@ -19,7 +19,7 @@ class Policy(PolicyBase):
     sender_id: int 
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 
 
 
 class UserBase(BaseModel):
@@ -36,4 +36,4 @@ class User(UserBase):
     policies: list[Policy] = []
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 
