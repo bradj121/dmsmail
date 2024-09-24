@@ -9,11 +9,12 @@ import {
 import { LuUnplug } from "react-icons/lu";
 import { PiPlugsConnectedBold } from "react-icons/pi";
 import { Button } from '@/app/ui/button';
+import { createPolicy } from '@/app/lib/actions';
 
 export default function Form() {
   return (
-    <form>
-      <div className="rounded-md bg-gray-800 p-4 md:p-6">
+    <form action={createPolicy}>
+      <div className="rounded-sm bg-gray-800 p-4 md:p-6">
         {/* Recipients */}
         <div className="mb-4">
           <label htmlFor="amount" className="mb-2 block text-sm font-medium text-green-400">
@@ -26,7 +27,7 @@ export default function Form() {
                 name="recipients"
                 type="string"
                 placeholder="Enter email addresses"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
@@ -45,7 +46,7 @@ export default function Form() {
                 name="subject"
                 type="string"
                 placeholder="Enter email subject"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <PencilSquareIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
@@ -64,7 +65,7 @@ export default function Form() {
                 name="body"
                 placeholder="Enter email body"
                 rows={10}
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <DocumentIcon className="pointer-events-none absolute left-3 top-5 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
@@ -73,7 +74,7 @@ export default function Form() {
 
         {/* Attachments */}
         <div className="mb-4">
-          <label htmlFor="amount" className="mb-2 block text-sm font-medium text-green-400">
+          <label htmlFor="attachments" className="mb-2 block text-sm font-medium text-green-400">
             Enter the collateral to attach to your policy email
           </label>
           <div className="relative mt-2 rounded-md">
@@ -82,7 +83,8 @@ export default function Form() {
                 id="attachments"
                 name="attachments"
                 type="file"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
+                multiple
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
               />
               <PaperClipIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
             </div>
@@ -101,7 +103,7 @@ export default function Form() {
                 name="subject"
                 type="string"
                 placeholder="Enter duration (e.g. 24h, 7d, 1y)"
-                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <ClockIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
@@ -113,8 +115,24 @@ export default function Form() {
           <legend className="mb-2 block text-sm font-medium text-green-400">
             Set the policy status
           </legend>
-          <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
+          <div className="rounded-sm border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
+            <div className="flex items-center">
+                <input
+                  id="active"
+                  name="status"
+                  type="radio"
+                  value="active"
+                  defaultChecked
+                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
+                />
+                <label
+                  htmlFor="active"
+                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
+                >
+                  Active <PiPlugsConnectedBold className="h-4 w-4" />
+                </label>
+              </div>
               <div className="flex items-center">
                 <input
                   id="inactive"
@@ -128,21 +146,6 @@ export default function Form() {
                   className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
                   Inactive <LuUnplug className="h-4 w-4" />
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="active"
-                  name="status"
-                  type="radio"
-                  value="active"
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                />
-                <label
-                  htmlFor="active"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Active <PiPlugsConnectedBold className="h-4 w-4" />
                 </label>
               </div>
             </div>

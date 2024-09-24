@@ -1,27 +1,28 @@
-import { CheckIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { LuUnplug } from "react-icons/lu";
+import { PiPlugsConnectedBold } from "react-icons/pi";
 import clsx from 'clsx';
 
-export default function InvoiceStatus({ status }: { status: string }) {
+export default function PolicyStatus({ is_active }: { is_active: boolean }) {
   return (
     <span
       className={clsx(
         'inline-flex items-center rounded-full px-2 py-1 text-xs',
         {
-          'bg-gray-100 text-gray-500': status === 'pending',
-          'bg-green-500 text-white': status === 'paid',
+          'bg-gray-100 text-gray-500': is_active === false,
+          'bg-green-500 text-white': is_active === true,
         },
       )}
     >
-      {status === 'pending' ? (
+      {is_active === false ? (
         <>
-          Pending
-          <ClockIcon className="ml-1 w-4 text-gray-500" />
+          Inactive
+          <LuUnplug className="ml-1 w-4 text-gray-500" />
         </>
       ) : null}
-      {status === 'paid' ? (
+      {is_active === true ? (
         <>
-          Paid
-          <CheckIcon className="ml-1 w-4 text-white" />
+          Active
+          <PiPlugsConnectedBold className="ml-1 w-4 text-white" />
         </>
       ) : null}
     </span>

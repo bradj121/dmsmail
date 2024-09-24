@@ -8,7 +8,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${vt323.className} antialiased`}>{children}</body>
+      <body className={`${vt323.className} antialiased text-green-400 bg-gray-400`}>{children}</body>
     </html>
   );
 }

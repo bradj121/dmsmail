@@ -1,7 +1,5 @@
 import Form from '@/app/ui/policies/create-form';
 import Breadcrumbs from '@/app/ui/policies/breadcrumbs';
-import { fetchCustomers } from '@/app/lib/data';
-import { CustomerField } from '@/app/lib/definitions';
  
 export default async function Page() {
  
