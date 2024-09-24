@@ -1,97 +1,148 @@
-import { CustomerField } from '@/app/lib/definitions';
 import Link from 'next/link';
 import {
-  CheckIcon,
   ClockIcon,
-  CurrencyDollarIcon,
+  DocumentIcon,
+  PencilSquareIcon,
   UserCircleIcon,
+  PaperClipIcon,
 } from '@heroicons/react/24/outline';
+import { LuUnplug } from "react-icons/lu";
+import { PiPlugsConnectedBold } from "react-icons/pi";
 import { Button } from '@/app/ui/button';
 
-export default function Form({ customers }: { customers: CustomerField[] }) {
+export default function Form() {
   return (
     <form>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        {/* Customer Name */}
+      <div className="rounded-md bg-gray-800 p-4 md:p-6">
+        {/* Recipients */}
         <div className="mb-4">
-          <label htmlFor="customer" className="mb-2 block text-sm font-medium">
-            Choose customer
-          </label>
-          <div className="relative">
-            <select
-              id="customer"
-              name="customerId"
-              className="peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select a customer
-              </option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
-                </option>
-              ))}
-            </select>
-            <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
-          </div>
-        </div>
-
-        {/* Invoice Amount */}
-        <div className="mb-4">
-          <label htmlFor="amount" className="mb-2 block text-sm font-medium">
-            Choose an amount
+          <label htmlFor="amount" className="mb-2 block text-sm font-medium text-green-400">
+            Enter the recipients of your Dead Man's Switch policy (space separated)
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input
-                id="amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                placeholder="Enter USD amount"
+                id="recipients"
+                name="recipients"
+                type="string"
+                placeholder="Enter email addresses"
                 className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
-              <CurrencyDollarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+              <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
           </div>
         </div>
 
-        {/* Invoice Status */}
+        {/* Policy Email Subject */}
+        <div className="mb-4">
+          <label htmlFor="subject" className="mb-2 block text-sm font-medium text-green-400">
+            Enter the subject for your triggered policy email
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input 
+                id="subject"
+                name="subject"
+                type="string"
+                placeholder="Enter email subject"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              />
+              <PencilSquareIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+
+        {/* Policy Email Body */}
+        <div className="mb-4">
+          <label htmlFor="subject" className="mb-2 block text-sm font-medium text-green-400">
+            Enter the body for your triggered policy email
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <textarea 
+                id="body"
+                name="body"
+                placeholder="Enter email body"
+                rows={10}
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              />
+              <DocumentIcon className="pointer-events-none absolute left-3 top-5 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+
+        {/* Attachments */}
+        <div className="mb-4">
+          <label htmlFor="amount" className="mb-2 block text-sm font-medium text-green-400">
+            Enter the collateral to attach to your policy email
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input
+                id="attachments"
+                name="attachments"
+                type="file"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
+              />
+              <PaperClipIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+
+        {/* Dead man's switch duration */}
+        <div className="mb-4">
+          <label htmlFor="subject" className="mb-2 block text-sm font-medium text-green-400">
+            Enter the period after which the dead man's switch will trigger and the email will be sent
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <div className="relative">
+              <input 
+                id="subject"
+                name="subject"
+                type="string"
+                placeholder="Enter duration (e.g. 24h, 7d, 1y)"
+                className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
+              />
+              <ClockIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+
+        {/* Policy Status */}
         <fieldset>
-          <legend className="mb-2 block text-sm font-medium">
-            Set the invoice status
+          <legend className="mb-2 block text-sm font-medium text-green-400">
+            Set the policy status
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
               <div className="flex items-center">
                 <input
-                  id="pending"
+                  id="inactive"
                   name="status"
                   type="radio"
-                  value="pending"
+                  value="inactive"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
-                  htmlFor="pending"
+                  htmlFor="inactive"
                   className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
                 >
-                  Pending <ClockIcon className="h-4 w-4" />
+                  Inactive <LuUnplug className="h-4 w-4" />
                 </label>
               </div>
               <div className="flex items-center">
                 <input
-                  id="paid"
+                  id="active"
                   name="status"
                   type="radio"
-                  value="paid"
+                  value="active"
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
-                  htmlFor="paid"
+                  htmlFor="active"
                   className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
                 >
-                  Paid <CheckIcon className="h-4 w-4" />
+                  Active <PiPlugsConnectedBold className="h-4 w-4" />
                 </label>
               </div>
             </div>
@@ -100,12 +151,12 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link
-          href="/dashboard/invoices"
+          href="/dashboard/policies"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
           Cancel
         </Link>
-        <Button type="submit">Create Invoice</Button>
+        <Button type="submit">Create Policy</Button>
       </div>
     </form>
   );

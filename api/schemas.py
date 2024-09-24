@@ -6,7 +6,7 @@ class PolicyBase(BaseModel):
     subject: str 
     body: str
     expiration_date: int
-    # attachments: str  # TODO figure out files
+    attachments: str  # TODO figure out files
     is_active: bool
 
 

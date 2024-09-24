@@ -13,10 +13,10 @@ export function CreatePolicy() {
   );
 }
 
-export function UpdateInvoice({ id }: { id: string }) {
+export function UpdatePolicy({ id }: { id: string }) {
   return (
     <Link
-      href="/dashboard/invoices"
+      href="/dashboard/policies"
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -24,7 +24,7 @@ export function UpdateInvoice({ id }: { id: string }) {
   );
 }
 
-export function DeleteInvoice({ id }: { id: string }) {
+export function DeletePolicy({ id }: { id: string }) {
   return (
     <>
       <button className="rounded-md border p-2 hover:bg-gray-100">
