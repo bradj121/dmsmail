@@ -13,7 +13,7 @@ export function CreatePolicy() {
   );
 }
 
-export function UpdatePolicy({ id }: { id: string }) {
+export function UpdatePolicy({ id }: { id: number }) {
   return (
     <Link
       href="/dashboard/policies"
@@ -24,7 +24,7 @@ export function UpdatePolicy({ id }: { id: string }) {
   );
 }
 
-export function DeletePolicy({ id }: { id: string }) {
+export function DeletePolicy({ id }: { id: number }) {
   return (
     <>
       <button className="rounded-md border p-2 hover:bg-gray-100">

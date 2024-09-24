@@ -24,7 +24,7 @@ class Policy(Base):
     subject = Column(String)
     body = Column(String)
     expiration_date = Column(Integer)
-    # attachments = Column()  # TODO: figure this out
+    attachments = Column(String)  # TODO: figure this out
     is_active = Column(Boolean, default=True)
 
     owner = relationship("User", back_populates="policies")

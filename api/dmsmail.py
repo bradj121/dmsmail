@@ -22,7 +22,7 @@ def get_db():
         db.close()
 
 
-@app.post("/users/", response_model=schemas.User)
+@app.post("/api/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
@@ -36,7 +36,7 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-@app.get("/users/{user_id}", response_model=schemas.User)
+@app.get("/api/users/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id=user_id)
     if not user_id:
@@ -44,7 +44,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.delete("/users/{user_id}")
+@app.delete("/api/users/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     deleted = crud.delete_user(db=db, user_id=user_id)
     if deleted:
@@ -53,7 +53,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Failed to delete user")
 
 
-@app.post("/users/{user_id}/policies", response_model=schemas.Policy)
+@app.post("/api/users/{user_id}/policies", response_model=schemas.Policy)
 def create_policy_for_user(user_id: int, policy: schemas.PolicyCreate, db: Session = Depends(get_db)):
     return crud.create_policy(db=db, policy=policy, user_id=user_id)
 

@@ -5,7 +5,17 @@ import { CreatePolicy } from '@/app/ui/policies/buttons';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
  
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  },
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+  
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -15,6 +25,7 @@ export default async function Page() {
         <Search placeholder="Search policies..." />
         <CreatePolicy />
       </div>
+        <Table query={query} currentPage={currentPage} />
       {/*  <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense> */}
