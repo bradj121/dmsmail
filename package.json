@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.4",
+    "@internationalized/date": "^3.5.5",
+    "@nextui-org/date-picker": "^2.1.8",
     "@tailwindcss/forms": "^0.5.7",
     "@vercel/postgres": "^0.8.0",
     "autoprefixer": "10.4.19",

@@ -26,7 +26,7 @@ export default async function PoliciesTable({
               >
                 <div className="flex items-center justify-between border-b pb-4">
                   <p className="text-sm">{policy.recipients}</p>
-                  <PolicyStatus is_active={policy.is_active} />
+                  <PolicyStatus status={policy.status} />
                 </div>
                 <div className="flex w-full items-center justify-between pt-4">
                   <div>
@@ -55,7 +55,7 @@ export default async function PoliciesTable({
                   Subject
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Time to Trigger
+                  Expiration Date
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   Status
@@ -81,7 +81,7 @@ export default async function PoliciesTable({
                     {policy.expiration_date}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    <PolicyStatus is_active={policy.is_active} />
+                    <PolicyStatus status={policy.status} />
                   </td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
