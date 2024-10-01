@@ -100,15 +100,15 @@ export default function Form() {
 
         {/* Dead man's switch duration */}
         <div className="mb-4">
-          <label htmlFor="expiration_date" className="mb-2 block text-sm font-medium text-green-400">
+          <label htmlFor="expirationDate" className="mb-2 block text-sm font-medium text-green-400">
             Enter the period after which the dead man's switch will trigger and the email will be sent
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <input 
                 type="date"
-                id="expiration_date"
-                name="expiration_date"
+                id="expirationDate"
+                name="expirationDate"
               />
               {/* <DatePicker
                label="Expiration Date" 

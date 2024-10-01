@@ -78,7 +78,7 @@ export default async function PoliciesTable({
                     {policy.subject}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
-                    {policy.expiration_date}
+                    {policy.expirationDate}
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     <PolicyStatus status={policy.status} />
