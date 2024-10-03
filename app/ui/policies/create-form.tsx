@@ -110,62 +110,9 @@ export default function Form() {
                 id="expirationDate"
                 name="expirationDate"
               />
-              {/* <DatePicker
-               label="Expiration Date" 
-               variant="bordered"
-               labelPlacement="inside"
-               isRequired={true}
-               className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
-               minValue={today(getLocalTimeZone())}
-               value={expirationDate}
-               onChange={(value) => setExpirationDate(value)}
-              /> */}
-              {/* <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" /> */}
             </div>
           </div>
         </div>
-
-        {/* Policy Status */}
-        {/* <fieldset>
-          <legend className="mb-2 block text-sm font-medium text-green-400">
-            Set the policy status
-          </legend>
-          <div className="rounded-sm border border-gray-200 bg-white px-[14px] py-3">
-            <div className="flex gap-4">
-            <div className="flex items-center">
-                <input
-                  id="active"
-                  name="status"
-                  type="radio"
-                  value="active"
-                  defaultChecked
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                />
-                <label
-                  htmlFor="active"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-green-500 px-3 py-1.5 text-xs font-medium text-white"
-                >
-                  Active <PiPlugsConnectedBold className="h-4 w-4" />
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  id="inactive"
-                  name="status"
-                  type="radio"
-                  value="inactive"
-                  className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
-                />
-                <label
-                  htmlFor="inactive"
-                  className="ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600"
-                >
-                  Inactive <LuUnplug className="h-4 w-4" />
-                </label>
-              </div>
-            </div>
-          </div>
-        </fieldset> */}
       </div>
       <div className="mt-6 flex justify-end gap-4">
         <Link

@@ -16,6 +16,10 @@ class PolicyCreate(PolicyBase):
     pass 
 
 
+class PolicyUpdate(PolicyBase):
+    pass
+
+
 class Policy(PolicyBase):
     id: int
     sender_id: int 

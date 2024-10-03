@@ -62,3 +62,12 @@ def create_policy_for_user(user_id: int, policy: schemas.PolicyCreate, db: Sessi
 def get_policies(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     policies = crud.get_policies(db, skip=skip, limit=limit)
     return policies
+
+@app.get("/api/policies/{policy_id}", response_model=schemas.Policy)
+def get_policy_by_id(policy_id: int, db: Session = Depends(get_db)):
+    policy = crud.get_policy_by_id(db, policy_id)
+    return policy 
+
+@app.put("/api/users/{user_id}/policies", response_model=schemas.Policy)  # TODO: get user from cookies or something
+def update_policy(user_id: int, policy: schemas.PolicyUpdate, db: Session = Depends(get_db)):
+    return crud.update_policy(db=db, policy=policy)

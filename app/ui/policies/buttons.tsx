@@ -1,4 +1,5 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useState } from "react";
 import Link from 'next/link';
 
 export function CreatePolicy() {
@@ -16,7 +17,7 @@ export function CreatePolicy() {
 export function UpdatePolicy({ id }: { id: number }) {
   return (
     <Link
-      href="/dashboard/policies"
+      href={`/dashboard/policies/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -29,6 +30,24 @@ export function DeletePolicy({ id }: { id: number }) {
     <>
       <button className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
+        <TrashIcon className="w-5" />
+      </button>
+    </>
+  );
+}
+
+export function DeleteAttachment({ attachments }: { attachments: string[] }) {
+  const [attachmentList, setAttachmentList] = useState(attachments);
+
+function handleClick(attachment: string) {
+    console.log(`Deleting attachment: ${attachment}`)
+    setAttachmentList(attachmentList.filter(attachment => attachment !== attachment))
+}
+
+  return (
+    <>
+      <button className="rounded-md border p-2 hover:bg-gray-100" onClick={handleClick.bind(null, attachment)}>
+        <span className="sr-only">Delete Collateral</span>
         <TrashIcon className="w-5" />
       </button>
     </>
