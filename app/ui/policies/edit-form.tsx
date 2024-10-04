@@ -6,13 +6,14 @@ import {
   PencilSquareIcon,
   UserCircleIcon,
   PaperClipIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import { LuUnplug } from "react-icons/lu";
 import { PiPlugsConnectedBold } from "react-icons/pi";
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { updatePolicy } from '@/app/lib/actions';
-import { AttachmentList } from './attachment-list';
+import { useState } from 'react';
 
 export default function EditPolicyForm({
   policy,
@@ -20,7 +21,19 @@ export default function EditPolicyForm({
   policy: Policy;
 }) {
   const updatePolicyWithId = updatePolicy.bind(null, policy.id);
-  const attachmentList = (policy.attachments as unknown as string).split(',');  // TODO: optimize
+
+  const initialAttachments = (policy.attachments as unknown as string).split(',');
+
+  const [attachmentList, setAttachmentList] = useState(initialAttachments);
+
+  console.log(attachmentList)
+
+  function handleClick(attachment: string) {
+    console.log(`Deleting attachment: ${attachment} sucka`);
+
+    setAttachmentList(attachmentList.filter((a) => (a !== attachment)))
+    console.log(`current attachments: ${attachmentList}`)
+}
 
   return (
     <form action={updatePolicyWithId}>
@@ -90,7 +103,20 @@ export default function EditPolicyForm({
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
-              <AttachmentList attachments={attachmentList} />
+              <ul>
+                {attachmentList.map(attachment => (
+                    <li key={attachment} className="whitespace-nowrap py-3 pl-6 pr-3">
+                        <div className="flex justify-start gap-3">
+                            <button type="button" className="rounded-md border p-2 hover:bg-gray-100" onClick={handleClick.bind(null, attachment)}>
+                                <span className="sr-only">Delete Collateral</span>
+                                <TrashIcon className="w-5" />
+                            </button>
+                            <label>{attachment}</label>
+                        </div>
+                    </li>
+                ))}
+              </ul>
+              <input type="hidden" id="existingAttachments" name="existingAttachments" value={attachmentList} />
             </div>
           </div>
         </div>

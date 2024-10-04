@@ -35,21 +35,3 @@ export function DeletePolicy({ id }: { id: number }) {
     </>
   );
 }
-
-export function DeleteAttachment({ attachments }: { attachments: string[] }) {
-  const [attachmentList, setAttachmentList] = useState(attachments);
-
-function handleClick(attachment: string) {
-    console.log(`Deleting attachment: ${attachment}`)
-    setAttachmentList(attachmentList.filter(attachment => attachment !== attachment))
-}
-
-  return (
-    <>
-      <button className="rounded-md border p-2 hover:bg-gray-100" onClick={handleClick.bind(null, attachment)}>
-        <span className="sr-only">Delete Collateral</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </>
-  );
-}
