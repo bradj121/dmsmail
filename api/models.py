@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Boolean, Column, Integer, String 
+from sqlalchemy import ForeignKey, Boolean, Column, Integer, String, Date
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -20,12 +20,12 @@ class Policy(Base):
 
     id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey("users.id"))
-    recipients = Column(String)  # TODO: Make handle list 
+    recipients = Column(String)
     subject = Column(String)
     body = Column(String)
-    expiration_date = Column(Integer)
-    # attachments = Column()  # TODO: figure this out
-    is_active = Column(Boolean, default=True)
+    expiration_date = Column(Date)
+    attachments = Column(String)  # TODO: figure this out
+    status = Column(String)
 
     owner = relationship("User", back_populates="policies")
 

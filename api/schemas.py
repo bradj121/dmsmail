@@ -1,17 +1,23 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 
 class PolicyBase(BaseModel):
-    recipients: str  # TODO: make a list
+    recipients: str
     subject: str 
     body: str
-    expiration_date: int
-    # attachments: str  # TODO figure out files
-    is_active: bool
+    expiration_date: date
+    attachments: str
+    status: str
 
 
 class PolicyCreate(PolicyBase):
     pass 
+
+
+class PolicyUpdate(PolicyBase):
+    pass
 
 
 class Policy(PolicyBase):
@@ -19,7 +25,7 @@ class Policy(PolicyBase):
     sender_id: int 
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 
 
 
 class UserBase(BaseModel):
@@ -36,4 +42,4 @@ class User(UserBase):
     policies: list[Policy] = []
 
     class Config:
-        orm_mode = True 
+        from_attributes = True 
