@@ -22,11 +22,17 @@ export default function EditPolicyForm({
 }) {
   const updatePolicyWithId = updatePolicy.bind(null, policy.id);
 
+  // Expect comma separated string
   const initialAttachments = (policy.attachments as unknown as string).split(',');
 
-  const [attachmentList, setAttachmentList] = useState(initialAttachments);
+  var initialState: any[] | (() => any[]) = []
+  if (initialAttachments[0] === '') {
+    initialState = []
+  } else {
+    initialState = initialAttachments;
+  }
 
-  console.log(attachmentList)
+  const [attachmentList, setAttachmentList] = useState(initialState);
 
   function handleClick(attachment: string) {
     console.log(`Deleting attachment: ${attachment} sucka`);
@@ -37,7 +43,7 @@ export default function EditPolicyForm({
 
   return (
     <form action={updatePolicyWithId}>
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
+      <div className="rounded-md bg-gray-800 p-4 md:p-6">
         {/* Recipients */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">

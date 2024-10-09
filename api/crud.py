@@ -52,8 +52,8 @@ def create_policy(db: Session, policy: schemas.PolicyCreate, user_id: int):
     return db_policy
 
 
-def update_policy(db: Session, policy: schemas.PolicyUpdate):
-    db_policy = db.query(models.Policy).filter(models.Policy.id == policy.id).first()
+def update_policy(db: Session, policy_id: int, policy: schemas.PolicyUpdate):
+    db_policy = db.query(models.Policy).filter(models.Policy.id == policy_id).first()
     db_policy.recipients = policy.recipients
     db_policy.subject = policy.subject
     db_policy.body = policy.body
@@ -61,3 +61,16 @@ def update_policy(db: Session, policy: schemas.PolicyUpdate):
     db_policy.expiration_date = policy.expiration_date
     db_policy.status = policy.status
     db.commit()
+    return db_policy
+
+
+def delete_policy(db: Session, user_id: int, policy_id: int):
+    policy = db.query(models.Policy).filter(models.Policy.id == policy_id).first()
+    if policy:
+        db.delete(policy)
+        db.commit()
+    policy = db.query(models.Policy).filter(models.Policy.id == policy_id).first()
+    if policy:
+        return False
+    else:
+        return True
