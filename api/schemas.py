@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -43,3 +44,17 @@ class User(UserBase):
 
     class Config:
         from_attributes = True 
+
+
+class Token(BaseModel):
+    token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+class SignInRequest(BaseModel):
+    email: str
+    password: str
