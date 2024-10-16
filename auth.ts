@@ -2,17 +2,26 @@ import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
-import { sql } from '@vercel/postgres';
 import type { User } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
 
+const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
+
 async function getUser(email: string): Promise<User | undefined> {
     try {
-        const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-        return user.rows[0];
+        const response = await fetch(`${URL}/users`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({email: email})
+        })
+        const user = await response.json() as unknown as User;
+        return user
+
     } catch(error) {
-        console.error('Failed to fetch user: ', error);
-        throw new Error('Failed to fetch user');
+        console.error('User not found');
+        throw new Error('User not found');
     }
 }
  
@@ -25,9 +34,12 @@ export const { auth, signIn, signOut } = NextAuth({
 
             if (parsedCredentials.success) {
                 const { email, password } = parsedCredentials.data;
+                console.log(email)
+                console.log(password)
                 const user = await getUser(email);
+                console.log(user)
                 if (!user) return null;
-                const passwordsMatch = await bcrypt.compare(password, user.password);
+                const passwordsMatch = await bcrypt.compare(password, user.hashed_password);
 
                 if (passwordsMatch) return user;
             }
