@@ -6,7 +6,7 @@ export default function DmsLogo() {
       className="flex flex-row items-center leading-none text-green-400"
     >
       <GiBurningSkull className="h-12 w-12 rotate-[15deg]" color="green-400" />
-      <p className="text-[28px] text-green-400">Dead Mans Switch</p>
+      <p className="text-[28px] text-green-400">Dead Man's Switch</p>
     </div>
   );
 }

@@ -1,16 +1,27 @@
 from typing import List, Optional, Any
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, APIRouter
+from fastapi.middleware.cors import CORSMiddleware
+
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from . import crud, models, schemas
+from . import crud, models, schemas, routers
 from .database import SessionLocal, engine
 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+app.include_router(routers.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 # Dependency
@@ -22,12 +33,33 @@ def get_db():
         db.close()
 
 
-@app.post("/api/users", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+@app.post("/api/auth/signup", response_model=schemas.User)
+def sign_up(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=user)
+
+
+@app.post("/api/auth/signin")
+def sign_in(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    pass
+
+
+# @app.post("/api/users", response_model=schemas.User)
+# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+#     db_user = crud.get_user_by_email(db, email=user.email)
+#     if db_user:
+#         raise HTTPException(status_code=400, detail="Email already registered")
+#     return crud.create_user(db=db, user=user)
+
+
+@app.post("/api/users", response_model=schemas.UserLogin)
+def get_user_by_email(user: schemas.UserBase, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
 
 
 @app.get("/api/users", response_model=list[schemas.User])
