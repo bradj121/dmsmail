@@ -19,7 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 43200
 
 @router.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(form_data.email, form_data.password)
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,7 +48,6 @@ def login_for_access_token(signin_request: schemas.SignInRequest):
 
 
 @ router.get("/users/me", response_model=schemas.User)
-def read_users_me(current_user: schemas.User =Depends(get_current_active_user)):
-    user = schemas.User(email=current_user.email)  # TODO: schema or model?
-    return user
+def read_users_me(current_user: schemas.User =Depends(get_current_active_user)):# TODO: schema or model?
+    return current_user
 
