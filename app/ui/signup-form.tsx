@@ -6,16 +6,13 @@ import {
   ExclamationCircleIcon,
   PencilSquareIcon,
 } from '@heroicons/react/24/outline';
-import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
-import { useActionState } from 'react';
 import { createUser } from '../lib/actions';
 
-export default function LoginForm() {
-  // const [errorMessage, formAction, isPending] = useActionState(createUser, undefined);
+export default function SignUpForm() {
 
   const isPending = false;
-  const errorMessage = "error";
+  const errorMessage = "error";  // figure out this
 
   return (
     <form action={createUser} className="space-y-3">
