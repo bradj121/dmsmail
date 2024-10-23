@@ -10,8 +10,17 @@ from jose import JWTError, jwt
 
 from sqlalchemy.orm import Session
 
-from .database import engine
+from .database import engine, SessionLocal
 from . import models, schemas
+
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 SECRET_KEY = "f6089f8c5cd8b0fd0edef389e9050fd5602bdd996119e8a354ab5ff33cd581f8"
@@ -51,25 +60,24 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    with Session(engine) as session:
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            email: str = payload.get("sub")
-            if email is None:
-                raise credentials_exception
-            token_data = schemas.TokenData(email=email)  # TODO: This is a schema
-        except JWTError:
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
-        user = session.query(models.User).filter(models.User.email == token_data.email).first()
-        if user is None:
-            raise credentials_exception
-        return user
+        token_data = schemas.TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+    user = db.query(models.User).filter(models.User.email == token_data.email).first()
+    if user is None:
+        raise credentials_exception
+    return user
     
 def get_current_active_user(current_user: models.User = Depends(get_current_user)):
     return current_user
