@@ -1,18 +1,43 @@
-import Image from 'next/image';
+'use client';
+
 import { UpdatePolicy, DeletePolicy } from '@/app/ui/policies/buttons';
 import PolicyStatus from '@/app/ui/policies/status';
 import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
-import { fetchFilteredPolicies } from '@/app/lib/data';
 import { Policy } from '@/app/lib/definitions';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-export default async function PoliciesTable({
+const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
+
+export default function PoliciesTable({
   query,
   currentPage,
 }: {
   query: string;
   currentPage: number;
 }) {
-  const policies = await fetchFilteredPolicies(query, currentPage);
+  const [policies, setPolicies] = useState([]);
+  const router = useRouter();
+  
+  useEffect(() => {
+    fetchFilteredPolicies(query, currentPage)
+  }, [])
+
+  async function fetchFilteredPolicies(query: string, currentPage: number) {
+    try {
+      const response = await fetch(`${URL}/auth/users/me/policies`, {
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        },
+      })
+      if (response.ok) {
+        const policiesJson = await response.json();
+        setPolicies(policiesJson);
+      }
+    } catch(error) {
+      console.error("Failed to get policies for user ", error)
+    }
+  }
 
   return (
     <div className="mt-6 flow-root">
