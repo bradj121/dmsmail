@@ -42,7 +42,6 @@ export default function LoginForm() {
     const formData = new FormData();
     formData.append('email', email);
     formData.append('password', password);
-    console.log(formData);
     setIsPending(true);
     const response = await fetch(`${URL}/auth/signin`, {
       method: "POST",

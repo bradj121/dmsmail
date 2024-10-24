@@ -1,6 +1,10 @@
+import shutil
+
+from typing import List, Annotated
+
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, File, UploadFile, Form
 from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
@@ -64,3 +68,23 @@ def read_users_me(current_user: schemas.User =Depends(get_current_active_user)):
 def get_my_policies(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return current_user.policies
 
+
+@router.post("/users/me/policies", response_model=schemas.Policy)
+def create_policy(policy: schemas.PolicyCreate, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    db_policy = crud.create_policy(db=db, policy=policy, user_id=current_user.id)
+    return db_policy
+
+@router.post("/users/me/policies/files")
+def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = File(...), current_user: schemas.User = Depends(get_current_active_user)):
+    fileDir = f'files/{current_user.id}/{policy_id}'
+
+    # check for file existence and make folder if necessary
+    for file in files:
+        try:
+            with open(f"{fileDir}/{file.filename}", 'wb') as f:
+                shutil.copyfileobj(file.file, f)
+        except:
+            # raise exception and undo policy db create
+            pass
+        finally:
+            file.file.close()

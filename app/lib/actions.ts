@@ -1,6 +1,5 @@
 'use server';
 
-import { AuthError } from "next-auth";
 import bcrypt from 'bcrypt';
 import { z } from "zod";
 import fs from "node:fs/promises";
@@ -56,30 +55,6 @@ export async function createUser(formData: FormData) {
         redirect("/login");
     }
 }
-
-// export async function authenticate(
-//     prevState: string | undefined,
-//     formData: FormData,
-// ) {
-//     const { email, password } = LoginFormSchema.parse({
-//         email: formData.get('email'),
-//         password: formData.get('password'),
-//     });
-
-//     try {
-//         await signIn('credentials', formData);
-//     } catch (error) {
-//         if (error instanceof AuthError) {
-//             switch (error.type) {
-//                 case 'CredentialsSignin':
-//                     return 'Invalid credentials.';
-//                 default:
-//                     return 'Something went wrong.';
-//             }
-//         }
-//         throw error;
-//     }
-// }
 
 export async function createPolicy(formData: FormData) {
     const { recipients, subject, body, expirationDate, attachments } = CreatePolicy.parse({
