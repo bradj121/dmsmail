@@ -1,6 +1,11 @@
+import shutil
+import os
+
+from typing import List, Annotated
+
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, File, UploadFile, Form
 from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
@@ -31,7 +36,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detaile="Incorrect email or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -46,7 +51,7 @@ def login_for_access_token(signin_request: schemas.SignInRequest):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detaile="Incorrect email or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -64,3 +69,32 @@ def read_users_me(current_user: schemas.User =Depends(get_current_active_user)):
 def get_my_policies(current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     return current_user.policies
 
+
+@router.post("/users/me/policies", response_model=schemas.Policy)
+def create_policy(policy: schemas.PolicyCreate, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    db_policy = crud.create_policy(db=db, policy=policy, user_id=current_user.id)
+    return db_policy
+
+@router.post("/users/me/policies/files")
+def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = File(...), current_user: schemas.User = Depends(get_current_active_user)):
+    fileDir = f'files/{current_user.id}/{policy_id}'
+
+    if not os.path.isdir(fileDir):
+        os.makedirs(fileDir, exist_ok=True)
+
+    for file in files:
+        try:
+            with open(f"{fileDir}/{file.filename}", 'wb') as f:
+                shutil.copyfileobj(file.file, f)
+        except:
+            # clear attachments field
+            db = get_db()
+            db_policy = crud.get_policy_by_id(db=db, policy_id=policy_id)
+            db_policy.attachments = ""
+            db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save policy attachments"
+            )
+        finally:
+            file.file.close()

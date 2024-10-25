@@ -1,6 +1,5 @@
 'use server';
 
-import { AuthError } from "next-auth";
 import bcrypt from 'bcrypt';
 import { z } from "zod";
 import fs from "node:fs/promises";
@@ -55,105 +54,6 @@ export async function createUser(formData: FormData) {
         revalidatePath("/login");
         redirect("/login");
     }
-}
-
-// export async function authenticate(
-//     prevState: string | undefined,
-//     formData: FormData,
-// ) {
-//     const { email, password } = LoginFormSchema.parse({
-//         email: formData.get('email'),
-//         password: formData.get('password'),
-//     });
-
-//     try {
-//         await signIn('credentials', formData);
-//     } catch (error) {
-//         if (error instanceof AuthError) {
-//             switch (error.type) {
-//                 case 'CredentialsSignin':
-//                     return 'Invalid credentials.';
-//                 default:
-//                     return 'Something went wrong.';
-//             }
-//         }
-//         throw error;
-//     }
-// }
-
-export async function createPolicy(formData: FormData) {
-    const { recipients, subject, body, expirationDate, attachments } = CreatePolicy.parse({
-        recipients: formData.get('recipients'),
-        subject: formData.get('subject'),
-        body: formData.get('body'),
-        expirationDate: formData.get('expirationDate'),
-        attachments: formData.getAll('attachments'),
-    });
-
-    const status = "active";
-
-    // Only push attachment filenames to DB
-    const fileNameArr = [];
-    if (attachments) {
-        
-        for (let i = 0; i < attachments.length; i++) {
-            const attachment = attachments[i];
-            if (attachment.size > 0) {
-                fileNameArr.push(attachment.name);
-            }
-        }
-    }
-    const fileNames = fileNameArr.join(', ');
-
-
-    const response = await fetch(`${URL}/users/1/policies`, {  // TODO: remove hard coded user
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            recipients: recipients,
-            subject: subject,
-            body: body,
-            expiration_date: expirationDate,
-            attachments: fileNames,
-            status: status,
-        }),
-    });
-
-    if (response.status != 200) {
-        console.error(`Failed to store policy: ${response}`);
-    } else {
-        if (attachments) {
-        // Save file to dir
-            const responseData = await response.json();
-            const policyId: string = responseData.id;
-            try {
-                const folderName = `./files/1/${policyId}`
-                await fs.mkdir(folderName);
-                for (let i = 0; i < attachments.length; i++) {
-                    const attachment = attachments[i];
-                    if (attachment && attachment.size > 0) {
-                        console.log(`Uploading Attachment: ${attachment.name}`);
-                        const arrayBuffer = await attachment.arrayBuffer();
-                        const buffer = new Uint8Array(arrayBuffer);
-                        // TODO: make directory for uploaded attachments user/policy specific
-                        await fs.writeFile(`./files/1/${policyId}/${attachment.name}`, buffer);
-                    }
-                }
-                
-            } catch (err) {
-                console.log(err);
-                const response = await fetch(`${URL}/users/1/policies/${policyId}`, {
-                    method: "DELETE",
-                    headers: {"Content-Type": "application/json"}
-                })
-            }
-        }
-    }
-
-    revalidatePath("/dashboard/policies");
-    redirect("/dashboard/policies");
 }
 
 export async function updatePolicy(id: number, formData: FormData) {

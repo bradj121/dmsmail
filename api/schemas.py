@@ -1,5 +1,7 @@
+from fastapi import File
+
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -8,7 +10,7 @@ class PolicyBase(BaseModel):
     recipients: str
     subject: str 
     body: str
-    expiration_date: date
+    expiration_date: str
     attachments: str
     status: str
 

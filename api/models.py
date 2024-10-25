@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Boolean, Column, Integer, String, Date
+from sqlalchemy import ForeignKey, Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -23,7 +23,7 @@ class Policy(Base):
     recipients = Column(String)
     subject = Column(String)
     body = Column(String)
-    expiration_date = Column(Date)
+    expiration_date = Column(String)
     attachments = Column(String)  # TODO: figure this out
     status = Column(String)
 
