@@ -20,7 +20,7 @@ class PolicyCreate(PolicyBase):
 
 
 class PolicyUpdate(PolicyBase):
-    pass
+    id: int
 
 
 class Policy(PolicyBase):

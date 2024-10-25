@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
 
@@ -92,8 +92,6 @@ export default function Form() {
       })
     })
 
-    console.log(attachments);
-
     if (response.ok && attachments) {
       const createJson = await response.json();
       const policyId = createJson.id;
@@ -102,7 +100,6 @@ export default function Form() {
       for (let i = 0; i < attachments.length; i++) {
         uploadFormData.append('files', attachments[i])
       }
-      console.log(uploadFormData);
       // Call to file upload api
       const fileUploadResponse = await fetch(`${URL}/auth/users/me/policies/files`, {
         method: "POST",
@@ -119,6 +116,8 @@ export default function Form() {
         console.error(fileUploadResponse)
         router.push("/dashboard/policies")
       }
+    } else {
+      router.push("/dashboard/policies")
     }
   }
   

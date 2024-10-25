@@ -1,7 +1,7 @@
 import shutil
 import os
 
-from typing import List, Annotated
+from typing import List
 
 from datetime import timedelta
 
@@ -10,7 +10,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
 
-from .auth import authenticate_user, create_access_token, get_current_active_user, get_password_hash
+from .auth import authenticate_user, create_access_token, get_current_active_user
 
 from .database import SessionLocal
 
@@ -74,6 +74,16 @@ def get_my_policies(current_user: schemas.User = Depends(get_current_active_user
 def create_policy(policy: schemas.PolicyCreate, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
     db_policy = crud.create_policy(db=db, policy=policy, user_id=current_user.id)
     return db_policy
+
+
+@router.put("/users/me/policies", response_model=schemas.Policy)
+def update_policy(policy: schemas.PolicyUpdate, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    updated_policy = crud.update_policy(db=db, policy_id=policy.id, policy=policy)
+
+    # TODO: Reconcile attachments list with files 
+
+    return update_policy
+
 
 @router.post("/users/me/policies/files")
 def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = File(...), current_user: schemas.User = Depends(get_current_active_user)):
