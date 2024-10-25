@@ -10,7 +10,7 @@ class PolicyBase(BaseModel):
     recipients: str
     subject: str 
     body: str
-    expiration_date: date
+    expiration_date: str
     attachments: str
     status: str
 

@@ -2,18 +2,12 @@
 
 import Link from 'next/link';
 import {
-  CalendarIcon,
   DocumentIcon,
   PencilSquareIcon,
   UserCircleIcon,
   PaperClipIcon,
 } from '@heroicons/react/24/outline';
-import { LuUnplug } from "react-icons/lu";
-import { PiCableCar, PiPlugsConnectedBold } from "react-icons/pi";
 import { Button } from '@/app/ui/button';
-import { createPolicy } from '@/app/lib/actions';
-import { DatePicker } from '@nextui-org/date-picker';
-import { getLocalTimeZone, today } from '@internationalized/date'
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
@@ -21,7 +15,7 @@ const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http:/
 
 export default function Form() {
   const router = useRouter();
-  const [expirationDate, setExpirationDate] = useState(new Date());
+  const [expirationDate, setExpirationDate] = useState<Date>(new Date());
   const [recipients, setRecipients] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -51,6 +45,14 @@ export default function Form() {
     setBody(target.value)
   }
 
+  function handleExpirationDateChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const target = e.target 
+    if (target === null) {
+      throw new Error("target is null")
+    }
+    setExpirationDate(new Date(target.value))
+  }
+
   function handleAttachmentsChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target 
     if (files === null) {
@@ -62,10 +64,6 @@ export default function Form() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('recipients', recipients);
-    formData.append('subject', subject);
-    formData.append('body', body);
 
     const fileNameArr = [];
     if (attachments) {
@@ -76,10 +74,7 @@ export default function Form() {
         }
       }
     }
-
     const fileNameStr = fileNameArr.join(',');
-    formData.append('attachments', fileNameStr);
-    formData.append('status', 'active');
 
     const response = await fetch(`${URL}/auth/users/me/policies`, {
       method: "POST",
@@ -87,18 +82,48 @@ export default function Form() {
         "Content-Type": "application/json",
         "Authorization": "Bearer " + localStorage.getItem('token')
       },
-      body: JSON.stringify(formData)
+      body: JSON.stringify({
+        recipients: recipients,
+        subject: subject,
+        body: body,
+        expiration_date: expirationDate.toLocaleDateString(),
+        attachments: fileNameStr,
+        status: 'active'
+      })
     })
 
-    if (response.ok) {
+    console.log(attachments);
+
+    if (response.ok && attachments) {
       const createJson = await response.json();
       const policyId = createJson.id;
+      const uploadFormData = new FormData();
+      uploadFormData.append('policy_id', policyId)
+      for (let i = 0; i < attachments.length; i++) {
+        uploadFormData.append('files', attachments[i])
+      }
+      console.log(uploadFormData);
       // Call to file upload api
+      const fileUploadResponse = await fetch(`${URL}/auth/users/me/policies/files`, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        },
+        body: uploadFormData
+      })
+      console.log(fileUploadResponse)
+      if (fileUploadResponse.ok) {
+        router.push("/dashboard/policies")
+      } else {
+        alert('Failed to attach files to policy.')
+        console.error(fileUploadResponse)
+        router.push("/dashboard/policies")
+      }
     }
   }
   
   return (
-    <form action={createPolicy}>
+    <form onSubmit={handleSubmit}>
       <div className="rounded-sm bg-gray-800 p-4 md:p-6">
         {/* Recipients */}
         <div className="mb-4">
@@ -194,6 +219,7 @@ export default function Form() {
                 type="date"
                 id="expirationDate"
                 name="expirationDate"
+                onChange={handleExpirationDateChange}
               />
             </div>
           </div>

@@ -1,4 +1,5 @@
 import shutil
+import os
 
 from typing import List, Annotated
 
@@ -35,7 +36,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detaile="Incorrect email or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -50,7 +51,7 @@ def login_for_access_token(signin_request: schemas.SignInRequest):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detaile="Incorrect email or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"}
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -78,13 +79,22 @@ def create_policy(policy: schemas.PolicyCreate, current_user: schemas.User = Dep
 def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = File(...), current_user: schemas.User = Depends(get_current_active_user)):
     fileDir = f'files/{current_user.id}/{policy_id}'
 
-    # check for file existence and make folder if necessary
+    if not os.path.isdir(fileDir):
+        os.makedirs(fileDir, exist_ok=True)
+
     for file in files:
         try:
             with open(f"{fileDir}/{file.filename}", 'wb') as f:
                 shutil.copyfileobj(file.file, f)
         except:
-            # raise exception and undo policy db create
-            pass
+            # clear attachments field
+            db = get_db()
+            db_policy = crud.get_policy_by_id(db=db, policy_id=policy_id)
+            db_policy.attachments = ""
+            db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save policy attachments"
+            )
         finally:
             file.file.close()
