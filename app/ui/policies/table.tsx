@@ -1,8 +1,9 @@
 'use client';
 
-import { UpdatePolicy, DeletePolicy } from '@/app/ui/policies/buttons';
+import { UpdatePolicy } from '@/app/ui/policies/buttons';
+import { TrashIcon } from '@heroicons/react/24/outline';
 import PolicyStatus from '@/app/ui/policies/status';
-import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
+import { formatDateToLocal } from '@/app/lib/utils';
 import { Policy } from '@/app/lib/definitions';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -39,6 +40,25 @@ export default function PoliciesTable({
     }
   }
 
+  async function deletePolicy(policyId: number) {
+    try {
+      const response = await fetch(`${URL}/auth/users/me/policies/${policyId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        }
+      })
+      if (response.ok) {
+        alert(`Policy ${policyId} deleted`)
+        fetchFilteredPolicies(query, currentPage)
+        router.push("/dashboard/policies")
+      }
+
+    } catch(error) {
+      console.error(`Failed to delete policy ${policyId}`, error)
+    }
+  }
+
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
@@ -64,7 +84,12 @@ export default function PoliciesTable({
                   </div>
                   <div className="flex justify-end gap-2">
                     <UpdatePolicy id={policy.id} />
-                    <DeletePolicy id={policy.id} />
+                    <button 
+                        className="rounded-md border p-2 hover:bg-gray-100"
+                        onClick={async () => await deletePolicy(policy.id)}>
+                        <span className="sr-only">Delete</span>
+                        <TrashIcon className="w-5" />
+                      </button>
                   </div>
                 </div>
               </div>
@@ -111,7 +136,12 @@ export default function PoliciesTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
                       <UpdatePolicy id={policy.id} />
-                      <DeletePolicy id={policy.id} />
+                      <button 
+                        className="rounded-md border p-2 hover:bg-gray-100"
+                        onClick={async () => await deletePolicy(policy.id)}>
+                        <span className="sr-only">Delete</span>
+                        <TrashIcon className="w-5" />
+                      </button>
                     </div>
                   </td>
                 </tr>

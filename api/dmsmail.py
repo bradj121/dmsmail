@@ -1,9 +1,6 @@
-from typing import List, Optional, Any
-
-from fastapi import FastAPI, Depends, HTTPException, APIRouter
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, routers
@@ -78,12 +75,3 @@ def get_policy_by_id(policy_id: int, db: Session = Depends(get_db)):
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
     return policy 
-
-
-@app.delete("/api/users/{user_id}/policies/{policy_id}")
-def delete_policy(user_id: int, policy_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_policy(db, user_id=user_id, policy_id=policy_id)
-    if deleted:
-        return f"Policy {policy_id} for user {user_id} has been deleted"
-    else:
-        raise HTTPException(status_code=400, detail=f"Failed to delete policy {policy_id} for user {user_id}")

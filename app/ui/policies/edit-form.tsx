@@ -7,12 +7,14 @@ import {
   UserCircleIcon,
   PaperClipIcon,
   TrashIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { LuUnplug } from "react-icons/lu";
 import { PiPlugsConnectedBold } from "react-icons/pi";
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updatePolicy } from '@/app/lib/actions';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -24,8 +26,7 @@ export default function EditPolicyForm({
   policy: Policy;
 }) {
   const router = useRouter();
-  const options = [{value: 'active', label: 'Active'}, {value: 'inactive', label: 'Inactive'}]
-  const updatePolicyWithId = updatePolicy.bind(null, policy.id);
+  const today = new Date();
 
   // Expect comma separated string
   const initialAttachments = (policy.attachments as unknown as string).split(',');
@@ -69,14 +70,6 @@ export default function EditPolicyForm({
     setBody(target.value)
   }
 
-  function handleExpirationDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const target = e.target 
-    if (target === null) {
-      throw new Error("target is null")
-    }
-    setExpirationDate(new Date(target.value))
-  }
-
   function handleAttachmentsChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { files } = e.target 
     if (files === null) {
@@ -86,12 +79,20 @@ export default function EditPolicyForm({
     setAttachments(selected)
   }
 
+  function handleExpirationDateChange(date: Date | null) {
+    if (date !== null) {
+      setExpirationDate(date);
+    }
+  }
+
   function handleStatusChange(e: React.ChangeEvent<HTMLInputElement>) {
     const target = e.target 
     if (target === null) {
       throw new Error("target is null")
     }
-    setStatus(target.value)
+    if (target.value === 'active' || target.value === 'inactive') {
+      setStatus(target.value)
+    }
   }
 
   function handleClick(attachment: string) {
@@ -111,6 +112,11 @@ export default function EditPolicyForm({
         if (attachment.size > 0) {
           fileNameArr.push(attachment.name);
         }
+      }
+    }
+    if (attachmentList) {
+      for (let i = 0; i < attachmentList.length; i++) {
+        fileNameArr.push(attachmentList[i])
       }
     }
     const fileNameStr = fileNameArr.join(',');
@@ -288,13 +294,13 @@ export default function EditPolicyForm({
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
-              <input 
-                type="date"
-                id="expirationDate"
-                name="expirationDate"
-                defaultValue={expirationDate.toISOString().substring(0,10)}
+            <DatePicker
+                selected={expirationDate}
                 onChange={handleExpirationDateChange}
+                minDate={today}
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
               />
+              <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
             </div>
           </div>
         </div>
