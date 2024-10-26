@@ -1,7 +1,7 @@
 import shutil
 import os
 
-from typing import List, Annotated
+from typing import List
 
 from datetime import timedelta
 
@@ -10,11 +10,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from sqlalchemy.orm import Session
 
-from .auth import authenticate_user, create_access_token, get_current_active_user, get_password_hash
+from .auth import authenticate_user, create_access_token, get_current_active_user
 
 from .database import SessionLocal
 
-from . import schemas, models, crud
+from . import schemas, crud
 
 
 router = APIRouter(prefix="/api/auth")
@@ -75,6 +75,21 @@ def create_policy(policy: schemas.PolicyCreate, current_user: schemas.User = Dep
     db_policy = crud.create_policy(db=db, policy=policy, user_id=current_user.id)
     return db_policy
 
+
+@router.put("/users/me/policies", response_model=schemas.Policy)
+def update_policy(policy: schemas.PolicyUpdate, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    updated_policy = crud.update_policy(db=db, policy_id=policy.id, policy=policy)
+
+    db_attachments = updated_policy.attachments.split(',')
+    policy_attachments_path = f"files/{current_user.id}/{policy.id}"
+    current_attachments = [f for f in os.listdir(policy_attachments_path) if os.path.isfile(os.path.join(policy_attachments_path, f))]
+    for attachment in current_attachments:
+        if attachment not in db_attachments:
+            os.remove(f"{policy_attachments_path}/{attachment}")
+
+    return updated_policy
+
+
 @router.post("/users/me/policies/files")
 def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = File(...), current_user: schemas.User = Depends(get_current_active_user)):
     fileDir = f'files/{current_user.id}/{policy_id}'
@@ -98,3 +113,19 @@ def upload_policy_files(policy_id: int = Form(...), files: List[UploadFile] = Fi
             )
         finally:
             file.file.close()
+
+
+@router.delete("/users/me/policies/{policy_id}")
+def delete_policy(policy_id: int, current_user: schemas.User = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    deleted = crud.delete_policy(db, policy_id=policy_id)
+    if deleted:
+        policy_attachments_path = f"files/{current_user.id}/{policy_id}"
+        if os.path.isdir(policy_attachments_path):
+            current_attachments = [f for f in os.listdir(policy_attachments_path) if os.path.isfile(os.path.join(policy_attachments_path, f))]
+            for attachment in current_attachments:
+                os.remove(f"{policy_attachments_path}/{attachment}")
+            os.rmdir(policy_attachments_path)
+        return f"Policy {policy_id} for user {current_user.id} has been deleted"
+    else:
+        raise HTTPException(status_code=400, detail=f"Failed to delete policy {policy_id} for user {current_user.id}")
+    

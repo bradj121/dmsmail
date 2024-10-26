@@ -13,7 +13,7 @@ export type User = {
 export type Policy = {
   id: number;
   sender: number;
-  recipients: string[];
+  recipients: string;
   subject: string;
   body: string;
   expiration_date: string

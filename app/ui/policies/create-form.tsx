@@ -6,16 +6,20 @@ import {
   PencilSquareIcon,
   UserCircleIcon,
   PaperClipIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
 
 export default function Form() {
   const router = useRouter();
-  const [expirationDate, setExpirationDate] = useState<Date>(new Date());
+  const today = new Date();
+  const [expirationDate, setExpirationDate] = useState(new Date());
   const [recipients, setRecipients] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -45,12 +49,10 @@ export default function Form() {
     setBody(target.value)
   }
 
-  function handleExpirationDateChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const target = e.target 
-    if (target === null) {
-      throw new Error("target is null")
+  function handleExpirationDateChange(date: Date | null) {
+    if (date !== null) {
+      setExpirationDate(date);
     }
-    setExpirationDate(new Date(target.value))
   }
 
   function handleAttachmentsChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -92,8 +94,6 @@ export default function Form() {
       })
     })
 
-    console.log(attachments);
-
     if (response.ok && attachments) {
       const createJson = await response.json();
       const policyId = createJson.id;
@@ -102,7 +102,6 @@ export default function Form() {
       for (let i = 0; i < attachments.length; i++) {
         uploadFormData.append('files', attachments[i])
       }
-      console.log(uploadFormData);
       // Call to file upload api
       const fileUploadResponse = await fetch(`${URL}/auth/users/me/policies/files`, {
         method: "POST",
@@ -119,6 +118,8 @@ export default function Form() {
         console.error(fileUploadResponse)
         router.push("/dashboard/policies")
       }
+    } else {
+      router.push("/dashboard/policies")
     }
   }
   
@@ -211,16 +212,17 @@ export default function Form() {
         {/* Dead man's switch duration */}
         <div className="mb-4">
           <label htmlFor="expirationDate" className="mb-2 block text-sm font-medium text-green-400">
-            Enter the period after which the dead man's switch will trigger and the email will be sent
+            Enter the expiration date after which the dead man's switch will trigger and the email will be sent
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
-              <input 
-                type="date"
-                id="expirationDate"
-                name="expirationDate"
+              <DatePicker
+                selected={expirationDate}
                 onChange={handleExpirationDateChange}
+                minDate={today}
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
               />
+              <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
             </div>
           </div>
         </div>

@@ -7,42 +7,176 @@ import {
   UserCircleIcon,
   PaperClipIcon,
   TrashIcon,
+  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { LuUnplug } from "react-icons/lu";
 import { PiPlugsConnectedBold } from "react-icons/pi";
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { updatePolicy } from '@/app/lib/actions';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
 
 export default function EditPolicyForm({
   policy,
 }: {
   policy: Policy;
 }) {
-  const updatePolicyWithId = updatePolicy.bind(null, policy.id);
+  const router = useRouter();
+  const today = new Date();
 
   // Expect comma separated string
   const initialAttachments = (policy.attachments as unknown as string).split(',');
 
-  var initialState: any[] | (() => any[]) = []
+  var initialState: any[] | (() => any[]) = [];
   if (initialAttachments[0] === '') {
-    initialState = []
+    initialState = [];
   } else {
     initialState = initialAttachments;
   }
 
   const [attachmentList, setAttachmentList] = useState(initialState);
+  const [expirationDate, setExpirationDate] = useState<Date>(new Date(policy.expiration_date));
+  const [recipients, setRecipients] = useState(policy.recipients);
+  const [subject, setSubject] = useState(policy.subject);
+  const [body, setBody] = useState(policy.body);
+  const [attachments, setAttachments] = useState<FileList | null>(null);
+  const [status, setStatus] = useState(policy.status);
+
+  function handleRecipientsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const target = e.target 
+    if (target === null) {
+      throw new Error("target is null")
+    }
+    setRecipients(target.value)
+  }
+
+  function handleSubjectChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const target = e.target 
+    if (target === null) {
+      throw new Error("target is null")
+    }
+    setSubject(target.value)
+  }
+
+  function handleBodyChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const target = e.target 
+    if (target === null) {
+      throw new Error("target is null")
+    }
+    setBody(target.value)
+  }
+
+  function handleAttachmentsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { files } = e.target 
+    if (files === null) {
+      throw new Error("target is null")
+    }
+    const selected = files as FileList;
+    setAttachments(selected)
+  }
+
+  function handleExpirationDateChange(date: Date | null) {
+    if (date !== null) {
+      setExpirationDate(date);
+    }
+  }
+
+  function handleStatusChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const target = e.target 
+    if (target === null) {
+      throw new Error("target is null")
+    }
+    if (target.value === 'active' || target.value === 'inactive') {
+      setStatus(target.value)
+    }
+  }
 
   function handleClick(attachment: string) {
     console.log(`Deleting attachment: ${attachment} sucka`);
 
     setAttachmentList(attachmentList.filter((a) => (a !== attachment)))
     console.log(`current attachments: ${attachmentList}`)
-}
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    const fileNameArr = [];
+    if (attachments) {
+      for (let i = 0; i < attachments.length; i++) {
+        const attachment = attachments[i];
+        if (attachment.size > 0) {
+          fileNameArr.push(attachment.name);
+        }
+      }
+    }
+    if (attachmentList) {
+      for (let i = 0; i < attachmentList.length; i++) {
+        fileNameArr.push(attachmentList[i])
+      }
+    }
+    const fileNameStr = fileNameArr.join(',');
+
+    console.log(recipients);
+    console.log(subject);
+    console.log(body);
+    console.log(expirationDate);
+    console.log(attachments);
+    console.log(fileNameStr);
+    console.log(status);
+
+    const response = await fetch(`${URL}/auth/users/me/policies`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem('token')
+      },
+      body: JSON.stringify({
+        id: policy.id,
+        recipients: recipients,
+        subject: subject,
+        body: body,
+        expiration_date: expirationDate.toLocaleDateString(),
+        attachments: fileNameStr,
+        status: status
+      })
+    })
+
+    if (response.ok && attachments) {
+      const createJson = await response.json();
+      const policyId = createJson.id;
+      const uploadFormData = new FormData();
+      uploadFormData.append('policy_id', policyId)
+      for (let i = 0; i < attachments.length; i++) {
+        uploadFormData.append('files', attachments[i])
+      }
+      // Call to file upload api
+      const fileUploadResponse = await fetch(`${URL}/auth/users/me/policies/files`, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem('token')
+        },
+        body: uploadFormData
+      })
+      console.log(fileUploadResponse)
+      if (fileUploadResponse.ok) {
+        router.push("/dashboard/policies")
+      } else {
+        alert('Failed to attach files to policy.')
+        console.error(fileUploadResponse)
+        router.push("/dashboard/policies")
+      }
+    } else {
+      router.push("/dashboard/policies")
+    }
+  }
 
   return (
-    <form action={updatePolicyWithId}>
+    <form onSubmit={handleSubmit}>
       <div className="rounded-md bg-gray-800 p-4 md:p-6">
         {/* Recipients */}
         <div className="mb-4">
@@ -55,6 +189,8 @@ export default function EditPolicyForm({
                 id="recipients"
                 name="recipients"
                 defaultValue={policy.recipients}
+                value={recipients}
+                onChange={handleRecipientsChange}
                 className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
@@ -74,6 +210,8 @@ export default function EditPolicyForm({
                 name="subject"
                 type="string"
                 defaultValue={policy.subject}
+                value={subject}
+                onChange={handleSubjectChange}
                 placeholder="Enter email subject"
                 className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
@@ -95,6 +233,8 @@ export default function EditPolicyForm({
                 placeholder="Enter email body"
                 rows={10}
                 defaultValue={policy.body}
+                value={body}
+                onChange={handleBodyChange}
                 className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
               />
               <DocumentIcon className="pointer-events-none absolute left-3 top-5 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
@@ -139,6 +279,7 @@ export default function EditPolicyForm({
                 name="attachments"
                 type="file"
                 multiple
+                onChange={handleAttachmentsChange}
                 className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
               />
               <PaperClipIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
@@ -146,19 +287,20 @@ export default function EditPolicyForm({
           </div>
         </div>
 
-        {/* Dead man's switch duration */}
+        {/* Dead man's Expiration Date */}
         <div className="mb-4">
           <label htmlFor="expirationDate" className="mb-2 block text-sm font-medium text-green-400">
-            Enter the period after which the dead man's switch will trigger and the email will be sent
+            Enter the date after which the dead man's switch will trigger and the email will be sent
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
-              <input 
-                type="date"
-                id="expirationDate"
-                name="expirationDate"
-                defaultValue={policy.expiration_date}
+            <DatePicker
+                selected={expirationDate}
+                onChange={handleExpirationDateChange}
+                minDate={today}
+                className="peer block w-full rounded-sm border border-gray-200 py-2 pl-10 text-sm outline-2 text-green-400"
               />
+              <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-green-400 peer-focus:text-gray-900" />
             </div>
           </div>
         </div>
@@ -177,6 +319,7 @@ export default function EditPolicyForm({
                   type="radio"
                   value="inactive"
                   defaultChecked={policy.status === 'inactive'}
+                  onChange={handleStatusChange}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label
@@ -193,6 +336,7 @@ export default function EditPolicyForm({
                   type="radio"
                   value="active"
                   defaultChecked={policy.status === 'active'}
+                  onChange={handleStatusChange}
                   className="h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2"
                 />
                 <label

@@ -1,5 +1,4 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { deletePolicy } from '@/app/lib/actions';
 import Link from 'next/link';
 
 export function CreatePolicy() {
@@ -22,17 +21,5 @@ export function UpdatePolicy({ id }: { id: number }) {
     >
       <PencilIcon className="w-5" />
     </Link>
-  );
-}
-
-export function DeletePolicy({ id }: { id: number }) {
-  const deletePolicyWithId = deletePolicy.bind(null, id)
-  return (
-    <form action={deletePolicyWithId}>
-      <button className="rounded-md border p-2 hover:bg-gray-100">
-        <span className="sr-only">Delete</span>
-        <TrashIcon className="w-5" />
-      </button>
-    </form>
   );
 }

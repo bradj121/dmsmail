@@ -63,7 +63,7 @@ def update_policy(db: Session, policy_id: int, policy: schemas.PolicyUpdate):
     return db_policy
 
 
-def delete_policy(db: Session, user_id: int, policy_id: int):
+def delete_policy(db: Session, policy_id: int):
     policy = db.query(models.Policy).filter(models.Policy.id == policy_id).first()
     if policy:
         db.delete(policy)
