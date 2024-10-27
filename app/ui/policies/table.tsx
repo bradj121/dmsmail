@@ -7,6 +7,7 @@ import { formatDateToLocal } from '@/app/lib/utils';
 import { Policy } from '@/app/lib/definitions';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Countdown from './timer';
 
 const URL = process.env.API_URL ? `https://${process.env.API_URL}/api` : "http://localhost:3000/api"
 
@@ -108,6 +109,9 @@ export default function PoliciesTable({
                   Expiration Date
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
+                  Time to Trigger
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
                   Status
                 </th>
                 <th scope="col" className="relative py-3 pl-6 pr-3">
@@ -129,6 +133,9 @@ export default function PoliciesTable({
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     { formatDateToLocal(policy.expiration_date) }
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">
+                    <Countdown targetDate={new Date(policy.expiration_date)} />
                   </td>
                   <td className="whitespace-nowrap px-3 py-3">
                     <PolicyStatus status={policy.status} />
