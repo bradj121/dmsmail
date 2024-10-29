@@ -1,17 +1,35 @@
+from datetime import datetime
+
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.jobstores.memory import MemoryJobStore
+
+from contextlib import asynccontextmanager
 
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas, routers
 from .database import SessionLocal, engine
+from .send_emails import send_policy_email
 
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
-app.include_router(routers.router)
 
+scheduler = AsyncIOScheduler(jobstores={"default": MemoryJobStore()})
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.start()
+    yield
+    scheduler.shutdown()
+
+
+app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json", lifespan=lifespan)
+app.include_router(routers.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -28,6 +46,19 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@scheduler.scheduled_job("interval", hours=1)
+async def send_messages_job():
+    with Session(engine) as db:
+        policies = db.query(models.Policy).all()
+        for policy in policies:
+            policy_expiration = datetime.strptime(policy.expiration_date, "%m/%d/%Y").date()
+            if policy_expiration >= datetime.today().date() and policy.status == 'active':
+                user = db.query(models.User).filter(models.User.id == policy.sender_id).first()
+                send_policy_email(user, policy)
+                policy.status = 'inactive'
+                db.commit()
 
 
 @app.post("/api/auth/signup", response_model=schemas.User)

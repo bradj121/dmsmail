@@ -6,22 +6,24 @@ import mimetypes
 
 from email.message import EmailMessage
 
-from . import schemas, crud
-
-# TODO: remove, added for testing
-from .database import engine
-from sqlalchemy.orm import Session
+from . import schemas
 
 
 def send_policy_email(sender: schemas.User, policy: schemas.Policy ):
+    """
+    Send an email to the designated policy recipients with the policy subject, body and attachments
+    """
     smtp_host = os.getenv('SMTP_HOST', 'localhost')
     smtp_port = int(os.getenv('SMTP_PORT', '8025'))
+    smtp_sender_email = os.getenv('SENDER_EMAIL')
+    smtp_sender_password = os.getenv('SENDER_PW')
 
     msg = EmailMessage()
 
     msg['Subject'] = policy.subject
-    msg['From'] = sender.email
+    msg['From'] = smtp_sender_email
     msg['To'] = ', '.join(policy.recipients.split(' '))
+    msg['Cc'] = sender.email
 
     msg.set_content(policy.body)
 
@@ -46,6 +48,5 @@ def send_policy_email(sender: schemas.User, policy: schemas.Policy ):
                                 )
     
     with smtplib.SMTP(smtp_host, smtp_port) as server:
-        server.login(sender.email, sender.smtp_pw)  # TODO: add as attribute
+        server.login(smtp_sender_email, smtp_sender_password)
         server.send_message(msg)
-
