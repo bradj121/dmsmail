@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session 
+from sqlalchemy.orm import Session
 
 from . import models, schemas
 
@@ -30,7 +30,7 @@ def delete_user(db: Session, user_id: int):
         db.commit()
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user:
-        return False 
+        return False
     else:
         return True
 

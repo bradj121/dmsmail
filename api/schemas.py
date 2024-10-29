@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 class PolicyBase(BaseModel):
     recipients: str
-    subject: str 
+    subject: str
     body: str
     expiration_date: str
     attachments: str
@@ -16,7 +16,7 @@ class PolicyBase(BaseModel):
 
 
 class PolicyCreate(PolicyBase):
-    pass 
+    pass
 
 
 class PolicyUpdate(PolicyBase):
@@ -25,10 +25,10 @@ class PolicyUpdate(PolicyBase):
 
 class Policy(PolicyBase):
     id: int
-    sender_id: int 
+    sender_id: int
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
 
 
 class UserBase(BaseModel):
@@ -45,12 +45,12 @@ class UserLogin(BaseModel):
 
 
 class User(UserBase):
-    id: int 
+    id: int
     is_active: bool
     policies: list[Policy] = []
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
 
 
 class Token(BaseModel):

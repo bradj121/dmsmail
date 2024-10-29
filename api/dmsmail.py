@@ -35,7 +35,7 @@ app.add_middleware(
     allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 
@@ -105,4 +105,4 @@ def get_policy_by_id(policy_id: int, db: Session = Depends(get_db)):
     policy = crud.get_policy_by_id(db, policy_id)
     if not policy:
         raise HTTPException(status_code=404, detail="Policy not found")
-    return policy 
+    return policy

@@ -46,7 +46,7 @@ def authenticate_user(email: str, password: str):
             return False
         if not verify_password(password, user.hashed_password):
             return False
-        return user 
+        return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -78,6 +78,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
-    
+
+
 def get_current_active_user(current_user: models.User = Depends(get_current_user)):
     return current_user
