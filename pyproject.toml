@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "apscheduler>=3.10.4",
     "fastapi>=0.115.0",
     "passlib>=1.7.4",
     "pydantic>=2.9.2",
@@ -14,8 +15,8 @@ dependencies = [
     "uvicorn>=0.30.6",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.3.3",
     "requests>=2.32.3",
     "aiosmtpd>=1.4.6",
