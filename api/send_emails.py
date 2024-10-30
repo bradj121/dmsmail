@@ -10,8 +10,11 @@ from . import schemas
 
 
 def send_policy_email(sender: schemas.User, policy: schemas.Policy):
-    """
-    Send an email to the designated policy recipients with the policy subject, body and attachments
+    """Sends the email defined by the policy
+
+    Args:
+        sender (schemas.User): The user to which the policy belongs
+        policy (schemas.Policy): The policy data which is used to construct the email
     """
     smtp_host = os.getenv('SMTP_HOST', 'localhost')
     smtp_port = int(os.getenv('SMTP_PORT', '8025'))
