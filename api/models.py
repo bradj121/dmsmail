@@ -13,7 +13,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     policies = relationship("Policy", back_populates="owner")
-    
+
 
 class Policy(Base):
     __tablename__ = "policies"
@@ -28,6 +28,3 @@ class Policy(Base):
     status = Column(String)
 
     owner = relationship("User", back_populates="policies")
-
-
-
