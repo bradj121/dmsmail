@@ -156,9 +156,13 @@ def update_policy(
 
     db_attachments = updated_policy.attachments.split(',')
     policy_attachments_path = f"files/{current_user.id}/{policy.id}"
-    current_attachments = [
-        f for f in os.listdir(policy_attachments_path) if os.path.isfile(os.path.join(policy_attachments_path, f))
-    ]
+    try:
+        current_attachments = [
+            f for f in os.listdir(policy_attachments_path) if os.path.isfile(os.path.join(policy_attachments_path, f))
+        ]
+    except FileNotFoundError:
+        current_attachments = []
+
     for attachment in current_attachments:
         if attachment not in db_attachments:
             os.remove(f"{policy_attachments_path}/{attachment}")
